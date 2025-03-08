@@ -1,11 +1,11 @@
 import os
 import logging
 import random
-from aiogram import Bot, Dispatcher, types
+import asyncio
+from aiogram import Bot, Dispatcher, types, Router
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import bold
 from dotenv import load_dotenv
-import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -15,9 +15,11 @@ TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("Error: BOT_TOKEN not found in environment variables.")
 
-# Set up bot and dispatcher
+# Set up bot, dispatcher, and router
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)  # ✅ Fix: Dispatcher needs bot instance
+dp = Dispatcher()  # ✅ Fix: Dispatcher doesn't take bot instance directly
+router = Router()
+dp.include_router(router)  # ✅ Fix: Attach router to dispatcher
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -40,13 +42,13 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 # Bot command handler
-@dp.message_handler(commands=['start'])
+@router.message(commands=['start'])  # ✅ Fix: Use router instead of dp
 async def start_command(message: types.Message):
     await message.answer(resources, reply_markup=keyboard)
 
 # Run the bot
 async def main():
-    await dp.start_polling()
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
