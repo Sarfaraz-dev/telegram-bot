@@ -1,8 +1,8 @@
 import os
 import logging
-import random
 import asyncio
-from aiogram import Bot, Dispatcher, types, Router
+from aiogram import Bot, Dispatcher, types, Router, F
+from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import bold
 from dotenv import load_dotenv
@@ -17,9 +17,9 @@ if not TOKEN:
 
 # Set up bot, dispatcher, and router
 bot = Bot(token=TOKEN)
-dp = Dispatcher()  # ✅ Fix: Dispatcher doesn't take bot instance directly
+dp = Dispatcher()
 router = Router()
-dp.include_router(router)  # ✅ Fix: Attach router to dispatcher
+dp.include_router(router)
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -41,8 +41,8 @@ keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="📘 Eloquent JavaScript", url="https://eloquentjavascript.net/")]
 ])
 
-# Bot command handler
-@router.message(commands=['start'])  # ✅ Fix: Use router instead of dp
+# ✅ Fix: Correct command handler syntax for aiogram v3
+@router.message(Command("start"))  # ✅ Correct aiogram v3 command syntax
 async def start_command(message: types.Message):
     await message.answer(resources, reply_markup=keyboard)
 
